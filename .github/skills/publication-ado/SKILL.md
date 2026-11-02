@@ -24,7 +24,7 @@ Si une écriture répond 401 ou 403 en mode API, proposer le mode CSV au lieu de
 ## 1. Construire les cas sans IA
 
 1. Si `qc-reports/US-<id>.md` n'existe pas ou ne contient aucun bloc ```gherkin : STOP, « Rapport introuvable : lancer d'abord /us-analysis puis /gherkin-test-generation, et relire le rapport ».
-2. Lire l'US (`$expand=all`) pour `System.TeamProject`, `System.AreaPath`, `System.IterationPath` et `System.Rev`. Garder l'id comme `<usId>`. Si la révision est plus récente que celle notée dans le rapport, STOP : « L'US a changé depuis l'analyse (révision <a> lue, <b> actuelle) : relancer /us-analysis ou confirmer explicitement que la modification ne change pas les scénarios ».
+2. Lire l'US avec `python3 .github/outils/lire_us.py <usId> …` pour `System.TeamProject`, `System.AreaPath`, `System.IterationPath` et `System.Rev`. Garder l'id comme `<usId>`. Si la révision est plus récente que celle notée dans le rapport, STOP : « L'US a changé depuis l'analyse (révision <a> lue, <b> actuelle) : relancer /us-analysis ou confirmer explicitement que la modification ne change pas les scénarios ».
 3. Personne à qui assigner les cas : l'adresse donnée dans la demande, sinon personne (le dire).
 4. Construire les corps de requête :
    ```bash
@@ -49,7 +49,7 @@ Ce que le script produit pour chaque scénario :
 
 1. Plan : `plan <id>` dans la demande, sinon le plan par défaut de la section 0 du contexte. Sans plan connu : STOP, le demander. `GET <url>/<projet ADO>/_apis/testplan/plans/<planId>?api-version=7.1`. En cas d'échec : STOP. Ne jamais créer de plan.
 2. Suite : `suite <id>` dans la demande (suite statique), sinon la suite basée sur l'exigence de l'US : lister `GET <url>/<projet ADO>/_apis/testplan/Plans/<planId>/suites?api-version=7.1` et chercher `suiteType` = `requirementTestSuite` avec `requirementId` = `<usId>`. Si elle n'existe pas, elle sera créée sous la suite racine du plan.
-3. Doublons : lire l'US avec `$expand=relations`, récupérer les cas déjà liés (`Microsoft.VSTS.Common.TestedBy-Forward`) et leurs titres. Un scénario dont le titre existe déjà n'est pas recréé : « déjà publié : <id> ».
+3. Doublons : la section « Liens » de `lire_us.py` donne les cas déjà liés (lignes « Tested By »). Lire leurs titres en un seul appel : `curl -sS -w '\n%{http_code}' -u ":$ADO_PAT" "<url>/<projet ADO>/_apis/wit/workitems?ids=<id1>,<id2>&fields=System.Title&api-version=7.1"`. Un scénario dont le titre existe déjà n'est pas recréé : « déjà publié : <id> ».
 
 ## 3. Aperçu, puis validation
 
@@ -73,7 +73,7 @@ Afficher, sans rien écrire : le plan et la suite (existante ou à créer), la l
      -d '[{"op":"add","path":"/relations/-","value":{"rel":"Microsoft.VSTS.Common.TestedBy-Reverse","url":"<url>/_apis/wit/workItems/<usId>","attributes":{"comment":"Cree par QC agent"}}}]' \
      "<url>/<projet ADO>/_apis/wit/workitems/<testCaseId>?api-version=7.1"
    ```
-4. Relire l'US avec `$expand=relations` et vérifier un lien `TestedBy-Forward` vers chaque cas créé. Lien manquant : relancer une fois ; sinon « Lien TC <id> -> US <usId> non créé : HTTP <code> ».
+4. Relancer `lire_us.py <usId>` et vérifier dans « Liens » une ligne « Tested By » pour chaque cas créé. Lien manquant : relancer une fois ; sinon « Lien TC <id> -> US <usId> non créé : HTTP <code> ».
 5. Suite statique : ajouter les cas avec `POST <url>/<projet ADO>/_apis/testplan/Plans/<planId>/Suites/<suiteId>/TestCase?api-version=7.1`, corps `[{"workItem":{"id":<id>}}]` dans un fichier.
 6. Cas paramétré : demander à l'utilisateur d'ouvrir ce cas une fois pour vérifier la grille des paramètres.
 

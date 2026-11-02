@@ -26,8 +26,8 @@ Une bonne pratique, une habitude du domaine ou une convention d'interface ne ren
 
 ## Étape 0 : lire les sources
 
-1. Lire l'US : description, critères d'acceptation, et les commentaires quand ils sont demandés. Noter sa révision (`System.Rev`) et sa date de modification : la publication les comparera. Si Azure DevOps n'est pas joignable, lire l'export `docs/projets/<projet>/sources/US-<id>.md` s'il existe, et le dire. Un passage marqué « non lu » dans l'export n'est jamais complété : il devient une question.
-2. Lire `docs/projets/<projet>/CONTEXTE.md` en entier, y compris la section 9 (points à confirmer), la section 10 (variations) et la section 11 (flux). S'il n'existe pas, le dire en une ligne, proposer `/init-contexte` et continuer sans rien inventer pour compenser.
+1. Lire l'US avec `python3 .github/outils/lire_us.py <id> --url <url> --projet "<projet ADO>" --export docs/projets/<projet>/sources` : description, critères d'acceptation, et les commentaires quand ils sont demandés. Noter sa révision (`System.Rev`) et sa date de modification : la publication les comparera. Si Azure DevOps n'est pas joignable, lire l'export `docs/projets/<projet>/sources/US-<id>.md` s'il existe, et le dire. Un passage marqué « non lu » dans l'export n'est jamais complété : il devient une question.
+2. Lire les sections du contexte utiles à l'analyse : `python3 .github/outils/contexte.py docs/projets/<projet>/CONTEXTE.md analyse` (toutes sauf la liste des sources et le journal ; section 9 sans les points répondus). Ajouter `--sections 2` seulement pour croiser avec une autre US (étape 1 bis). S'il n'existe pas, le dire en une ligne, proposer `/init-contexte` et continuer sans rien inventer pour compenser.
 3. Dans `docs/projets/<projet>/sources/`, lire seulement les passages que l'US ou le contexte citent.
 4. Une information donnée dans la demande (réponse du PO, texte d'une maquette) compte comme source seulement avec son auteur et sa date. Une décision du PO est de rang 2, un autre complément de rang 4.
 5. Si les critères ne sont pas numérotés, les numéroter `AC-1`, `AC-2` dans l'ordre du texte.

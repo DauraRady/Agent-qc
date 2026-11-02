@@ -12,8 +12,8 @@ Une US se lit rarement seule : une US du sprint 4 peut modifier, sans le dire, c
 
 ## 1. Lire
 
-1. Le contexte du projet en entier (`docs/projets/<projet>/CONTEXTE.md`), en particulier la section 2 (US connues et leurs cas de test), la section 5 (termes et synonymes), la section 6 (règles) et la section 9 (points ouverts).
-2. Chaque US citée, dans Azure DevOps, ou dans `docs/projets/<projet>/sources/US-<id>.md` si Azure DevOps n'est pas joignable (le dire). Noter pour chacune la révision lue (`System.Rev`) et sa date.
+1. Le contexte du projet, sections utiles seulement : `python3 .github/outils/contexte.py docs/projets/<projet>/CONTEXTE.md coherence`. En particulier la section 2 (US connues et leurs cas de test), la section 5 (termes et synonymes), la section 6 (règles) et la section 9 (points ouverts).
+2. Chaque US citée, avec `python3 .github/outils/lire_us.py <id> …` (toutes les US dans la même commande, enchaînées avec `&&`) : Azure DevOps, ou `docs/projets/<projet>/sources/US-<id>.md` si Azure DevOps n'est pas joignable (le dire). Noter pour chacune la révision lue (`System.Rev`) et sa date.
 3. Les US plus anciennes citées par le contexte qui touchent les mêmes champs ou écrans : seulement les passages concernés.
 4. Les fichiers de cas de test cités en section 2 du contexte, s'ils existent dans le dépôt : chercher les cas qui utilisent les champs touchés. S'ils n'existent pas, le dire.
 

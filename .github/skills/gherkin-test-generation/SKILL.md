@@ -12,7 +12,7 @@ Lire `references/guide-ecriture-gherkin.md` à la première utilisation de la se
 
 ## Point de départ
 
-1. Partir de l'analyse écrite dans `qc-reports/US-<id>.md` : règles, préconditions, combinaisons, verdict. Ne pas refaire l'analyse. Les scénarios s'ajoutent à la suite, dans le même fichier.
+1. Partir de l'analyse écrite dans `qc-reports/US-<id>.md` : règles, préconditions, combinaisons, verdict. Ne pas refaire l'analyse et ne pas relire l'US : l'analyse contient ses citations. Rouvrir l'US avec `lire_us.py` seulement pour vérifier une citation douteuse. Du contexte, charger seulement `python3 .github/outils/contexte.py docs/projets/<projet>/CONTEXTE.md gherkin` (rôles, comptes, écrans, données, synonymes). Les scénarios s'ajoutent à la suite, dans le même fichier.
 2. S'il n'y a pas d'analyse, appliquer d'abord `us-analysis`.
 3. Verdict « Non prête » : ne rédiger aucun scénario, renvoyer aux questions.
 4. Ne rédiger des scénarios que pour les règles Rédigeables. Une règle À arbitrer ou Exploratoire n'a jamais de scénario.
