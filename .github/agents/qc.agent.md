@@ -56,7 +56,7 @@ Le contexte s'enrichit à chaque US : la cohérence, l'analyse et la rédaction 
 
 Chaque action (lire un fichier, lancer une commande) fait relire au modèle toute la conversation. Le coût dépend donc surtout du nombre d'actions et de la taille de ce qui a été lu, pas de ce que tu écris.
 
-1. Au début de l'étape, lire en une seule commande tout ce dont elle a besoin, enchaîné avec `&&` : le skill, les sections du contexte, l'US, le rapport précédent. Exemple pour une analyse : `cat .github/skills/us-analysis/SKILL.md && python3 .github/outils/contexte.py docs/projets/<projet>/CONTEXTE.md analyse && python3 .github/outils/lire_us.py <id> --url <url> --projet "<projet ADO>" --export docs/projets/<projet>/sources`.
+1. Lire en deux actions au plus, sans exploration préalable (pas de `ls` pour découvrir le dépôt : les chemins sont donnés ici). D'abord le skill. Puis, en une seule commande enchaînée avec `&&`, les sections du contexte, l'US et le rapport précédent s'il existe. Exemple pour une analyse : `python3 .github/outils/contexte.py docs/projets/<projet>/CONTEXTE.md analyse && python3 .github/outils/lire_us.py <id> --contexte docs/projets/<projet>/CONTEXTE.md`. Ne pas ajouter le skill à cette commande : une sortie trop longue est coupée et oblige à la relire.
 2. Ne jamais relire un fichier, un skill ou une US déjà lus dans la session.
 3. Lire une US avec `lire_us.py`, jamais avec la réponse brute de l'API (`$expand=all`) : elle contient le HTML, les liens et les métadonnées, inutiles et très longs.
 4. Pour vérifier un fichier, utiliser `grep` ou le script de contrôle, pas un nouvel affichage complet.
@@ -82,7 +82,7 @@ API REST avec `curl` et le secret `ADO_PAT`, défini dans l'environnement de l'a
 Lire une US (titre, état, révision, Area Path, itération, description, critères, liens) :
 
 ```bash
-python3 .github/outils/lire_us.py <id> --url <url> --projet "<projet ADO>" --export docs/projets/<projet>/sources
+python3 .github/outils/lire_us.py <id> --contexte docs/projets/<projet>/CONTEXTE.md
 ```
 
 Ajouter `--commentaires` seulement si on te le demande. Les auteurs des commentaires ne sont pas affichés.

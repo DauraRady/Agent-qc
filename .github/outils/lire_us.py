@@ -6,8 +6,12 @@ les métadonnées de chaque champ. Elle reste ensuite dans la conversation et
 est relue à chaque action de l'agent. Ce script la réduit à un texte court.
 
 Usage :
+  python3 .github/outils/lire_us.py <id> --contexte docs/projets/<projet>/CONTEXTE.md [--commentaires]
   python3 .github/outils/lire_us.py <id> --url <url organisation> --projet <projet ADO>
          [--commentaires] [--export <dossier sources>]
+
+Avec --contexte, l'URL et le projet viennent de la section 0 du contexte et
+l'export est cherché dans le dossier sources/ voisin.
 
 Le PAT est lu dans la variable ADO_PAT. Il n'est jamais affiché.
 Sans PAT ou sans réponse d'Azure DevOps, le script lit l'export
@@ -94,14 +98,36 @@ def depuis_export(dossier, us_id, raison):
     return 3
 
 
+def config_contexte(chemin):
+    """Lit l'URL et le projet Azure DevOps dans la section 0 du contexte."""
+    valeurs = {}
+    with open(chemin, encoding="utf-8") as f:
+        for l in f:
+            m = re.match(r"\|\s*(URL de l'organisation|Projet Azure DevOps)\s*\|\s*([^|]+?)\s*\|", l)
+            if m and not m.group(2).startswith("["):
+                valeurs[m.group(1)] = m.group(2)
+    return valeurs.get("URL de l'organisation"), valeurs.get("Projet Azure DevOps")
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("id")
-    p.add_argument("--url", required=True, help="https://dev.azure.com/<organisation> ou https://<organisation>.visualstudio.com")
-    p.add_argument("--projet", required=True)
+    p.add_argument("--contexte", help="docs/projets/<projet>/CONTEXTE.md")
+    p.add_argument("--url", help="https://dev.azure.com/<organisation> ou https://<organisation>.visualstudio.com")
+    p.add_argument("--projet")
     p.add_argument("--commentaires", action="store_true")
     p.add_argument("--export", help="dossier docs/projets/<projet>/sources")
     a = p.parse_args()
+    if a.contexte:
+        if not os.path.isfile(a.contexte):
+            print("ÉCHEC : %s n'existe pas. Proposer init-contexte." % a.contexte)
+            return 3
+        url, projet = config_contexte(a.contexte)
+        a.url, a.projet = a.url or url, a.projet or projet
+        a.export = a.export or os.path.join(os.path.dirname(a.contexte), "sources")
+    if not a.url or not a.projet:
+        print("ÉCHEC : URL ou projet Azure DevOps manquant (section 0 du contexte à compléter).")
+        return 2
 
     if not re.fullmatch(r"\d+", a.id):
         print("ÉCHEC : identifiant d'US invalide.")
