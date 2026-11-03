@@ -1,59 +1,45 @@
-# Agent QA pour l'onglet Agents de GitHub
+# Agents QA
 
-## Installer (une fois, sur une branche du dépôt de l'équipe)
+Cinq agents, un fichier chacun, sans skill ni script. Chaque agent ne contient que sa méthode et ne lit que les fichiers dont il a besoin.
 
-1. Copier à la racine du dépôt : `.github/agents/qc.agent.md` (il remplace l'actuel), `.github/qc/`, `.github/copilot-instructions.md`, `docs/`, `qc-reports/`.
-2. Ajouter `.qc-agent/` au `.gitignore`.
-3. Vérifier que le secret `ADO_PAT` existe dans Settings, Environments, `copilot` (l'agent actuel l'utilise déjà). En lecture seule pour analyser ; lecture et écriture seulement pour publier.
-4. Ouvrir une pull request, la faire relire, fusionner.
+| Agent | Demande | Lit | Écrit |
+|---|---|---|---|
+| `qa-0-contexte` | `init`, `maj <id>`, `maj sprint-<n>`, `po "<réponse>" (auteur, date)` | Le rapport concerné, puis seulement les fichiers de contexte touchés | `qa/contexte/`, après « oui » |
+| `qa-1-coherence-sprint` | `<id> <id> … sprint=<n>` | `socle.md`, `regles-et-points.md`, les US du sprint | `qa/rapports/sprint-<n>-coherence.md` et un `US-<id>-ecarts.md` par US |
+| `qa-2-analyse-us` | `<id>`, ou l'id suivi du texte de l'US | `socle.md`, `regles-et-points.md`, `US-<id>-ecarts.md`, l'US | `qa/rapports/US-<id>-analyse.md` |
+| `qa-3-cas-de-test` | `<id>`, `csv <id>`, `publie <id>` | `socle.md`, l'analyse | `qa/rapports/US-<id>-cas.md`, le CSV, Test Plans après « oui » |
+| `qa-4-anomalie` | `rédige <id> : <constat>`, `crée`, `doublons <mots>` | `socle.md`, l'analyse ou l'US | `qa/anomalies/`, Azure DevOps après « oui » |
 
-## Utiliser
+Ordre d'un sprint : `qa-1-coherence-sprint`, puis pour chaque US `qa-2-analyse-us` et `qa-3-cas-de-test`, puis `qa-0-contexte` pour enrichir le contexte. Chaque étape dans un nouveau chat : ce qui passe d'une étape à l'autre passe par les fichiers de `qa/`, pas par l'historique.
 
-Dans l'onglet Agents du dépôt, choisir « qc agent », puis écrire :
+## Installer
 
-| Je veux | J'écris |
+1. Copier à la racine du dépôt : `.github/agents/`, `.github/copilot-instructions.md`, `qa/`.
+2. Ajouter `.qc-agent/` au `.gitignore` (fichiers de travail des écritures dans Azure DevOps).
+3. Remplir `qa/contexte/` avec l'agent `qa-0-contexte` (`init`), ou y copier un contexte existant.
+4. Déposer les US à analyser dans `qa/sources/US-<id>.md` si l'agent ne peut pas les lire dans Azure DevOps.
+
+Un dépôt correspond à un projet : les chemins sont fixes, l'agent n'a rien à chercher.
+
+## Azure DevOps
+
+Les agents lisent une US avec `curl` et le champ `fields=` : seuls le titre, l'état, la révision, l'Area Path, l'itération, la description et les critères sont demandés. Le PAT est lu dans la variable `ADO_PAT` (secret de l'environnement `copilot` sur GitHub, variable d'environnement en local). Sous Windows, les agents utilisent `curl.exe` et `$env:ADO_PAT`.
+
+| Pour | Droits du PAT |
 |---|---|
-| Contrôler un sprint | `coherence-sprint 1201 1202 1203 1204 sprint=4` |
-| Analyser une US | `us-analysis 1204` |
-| Écrire les scénarios | `gherkin-test-generation 1204` |
-| Enrichir le contexte | `maj-contexte 1204` |
-| Obtenir le CSV | `publication-ado 1204 csv` |
-| Publier dans Test Plans | `publication-ado 1204` |
-| Rédiger un bug | `redaction-anomalie` puis ce que j'ai constaté |
+| Analyser, rédiger, cohérence | Work Items, lecture |
+| Publier les cas | Work Items lecture et écriture, Test Management lecture et écriture |
+| Créer un bug | Work Items lecture et écriture |
 
-L'agent fait une étape, écrit son fichier dans `qc-reports/`, s'arrête et propose la suite. Ses fichiers arrivent dans la pull request de la session : relire, puis fusionner.
+Aucune écriture sans aperçu et « oui ». Sur GitHub, ces règles sont des consignes : le verrou technique est le droit du PAT.
 
-## À savoir
-
-1. Sur GitHub, aucun script ne bloque une écriture dans Azure DevOps : c'est une consigne de l'agent. Le vrai verrou est le PAT en lecture seule.
-2. Premier test conseillé : `coherence-sprint` sur le sprint 4, puis comparer avec le rapport de référence `qc-reports/reference-sprint-4-coherence.md` s'il est fourni.
-
-## Utiliser dans VS Code sans gaspiller de crédits
-
-VS Code lit le même agent (`.github/agents`). À chaque message, Copilot renvoie au modèle tout l'historique du chat, les fichiers joints et la description des outils actifs, et il le refait à chaque action de l'agent. Le coût dépend donc surtout de ces règles d'usage :
+## Consommer peu de crédits
 
 | Règle | Pourquoi |
 |---|---|
-| Choisir « qc agent » dans la liste des agents, pas l'agent par défaut | « qc agent » n'a que trois outils (lire, modifier, lancer une commande). L'agent par défaut envoie aussi la description de tous les outils et serveurs MCP installés |
-| Choisir un modèle standard | Le prix au token change beaucoup d'un modèle à l'autre ; le plus puissant n'est pas nécessaire pour ces étapes |
+| Choisir l'agent de l'étape, pas l'agent par défaut | L'agent par défaut envoie la description de tous les outils et serveurs MCP installés à chaque message |
+| Un modèle standard, pas « Auto » ni le plus puissant | Le prix au token change beaucoup d'un modèle à l'autre |
 | Un nouveau chat par étape | Un chat qui s'allonge renvoie tout son historique à chaque message |
-| Écrire la demande complète en un seul message (`us-analysis 1201`) | Un message sans demande appelle une réponse, puis un deuxième envoi de tout l'historique |
-| Ne pas coller l'US : donner son numéro | Le texte collé est renvoyé à chaque message. Sans accès à Azure DevOps, déposer l'US une fois dans `docs/projets/<projet>/sources/US-<id>.md` |
-| Fermer les gros fichiers avant d'écrire, retirer les pièces jointes proposées | Le fichier ouvert est souvent joint automatiquement au message |
-
-Pour mesurer : noter les crédits Copilot avant et après une étape, dans les paramètres du compte GitHub.
-
-## Pourquoi les méthodes ne sont pas des skills
-
-Les méthodes de chaque étape sont dans `.github/qc/etapes/`, pas dans `.github/skills/`. Copilot annonce à chaque message la liste et la description de tous les skills du dépôt, et peut en charger plusieurs s'il les juge utiles. Ici, l'agent lit la méthode de l'étape demandée, et elle seule.
-
-| Fichier | Rôle |
-|---|---|
-| `.github/agents/qc.agent.md` | Le routeur : quelle méthode lire, quel profil de contexte, quelles lectures, pour chaque étape |
-| `.github/qc/etapes/*.md` | Une méthode par étape |
-| `.github/qc/outils/contexte.py` | Les sections du contexte utiles à l'étape (profils `coherence`, `analyse`, `gherkin`, `publication`, `anomalie`) |
-| `.github/qc/outils/lire_us.py` | L'US réduite à l'utile, depuis Azure DevOps ou l'export |
-| `.github/qc/outils/ecarts.py` | Les écarts d'un rapport de cohérence de sprint qui concernent une US |
-| `.github/qc/outils/build_tc.py` | Contrôle des scénarios, tableau Azure DevOps, CSV |
-
-Ce qui passe d'une étape à l'autre passe par les fichiers (`qc-reports/`, `CONTEXTE.md`), pas par l'historique du chat : chaque étape peut donc partir d'un chat neuf.
+| La demande complète en un seul message | Un message sans demande appelle une réponse, puis un deuxième envoi de tout l'historique |
+| Donner le numéro de l'US plutôt que la coller, si elle est dans `qa/sources/` ou lisible dans Azure DevOps | Un texte collé est renvoyé à chaque message du chat |
+| Supprimer les anciennes versions (`.github/skills/`, `.github/qc/`, ancien `qc.agent.md`) | Copilot annonce tous les skills du dépôt à chaque message, et deux agents du même nom se confondent |
