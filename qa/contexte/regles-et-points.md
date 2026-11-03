@@ -1,6 +1,6 @@
 # Contexte projet : [NOM DU PROJET] : regles-et-points
 
-Sources et US du projet, règles transverses, points à confirmer, variations, flux. Lu par la cohérence et l'analyse.
+Sources et US du projet, règles transverses, points à confirmer, variations, flux. Lu par l'analyse et les cas de test.
 
 ## 2. Sources
 

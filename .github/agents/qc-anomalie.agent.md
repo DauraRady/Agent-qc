@@ -1,5 +1,5 @@
 ---
-name: qa-4-anomalie
+name: qc-anomalie
 description: 'Rédige un ticket d''anomalie reproductible et sourcé à partir d''un constat de test, puis, sur demande et après « oui », le crée dans Azure DevOps et le lie à l''US.'
 tools:
   - read

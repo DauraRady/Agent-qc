@@ -13,7 +13,7 @@ Fichier lu par l'agent QA avant chaque analyse d'US. Il donne la configuration A
 Règles de tenue du fichier :
 
 1. Une ligne n'entre ici que si elle a une source (US, décision du PO datée, PRD, maquette citée). Sans source, elle va en section 9.
-2. Seul l'agent `qa-0-contexte` écrit dans ces fichiers (création, ou mise à jour après aperçu et « oui »). Un humain relit les différences avant chaque commit.
+2. Seul l'agent `qc-cas-de-test` écrit dans ces fichiers, après aperçu et « oui ». Un humain relit les différences avant chaque commit.
 3. Une règle remplacée n'est pas supprimée : son statut passe à `remplacée` et la colonne « Remplacée par » est remplie.
 4. Ce fichier ne remplace jamais l'US en cours : il la complète.
 5. C'est une synthèse : une ligne par règle, pas de paragraphe recopié des sources.
