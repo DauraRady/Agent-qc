@@ -1,12 +1,4 @@
----
-name: maj-contexte
-description: 'Met à jour le contexte du projet avec ce que l''humain a validé, après aperçu et « oui » explicite. Trois entrées possibles : les propositions d''un rapport d''US, une réponse du PO avec son auteur et sa date, une nouvelle version d''une source. N''ajoute jamais une hypothèse, ne supprime jamais une ligne.'
-argument-hint: '<id US> | po "<réponse>" (auteur, date) | source <fichier>'
----
-
 # Mise à jour du contexte projet
-
-Arguments : ceux donnés dans la demande (numéros d'US, options).
 
 Le contexte est lu avant chaque analyse. Une erreur écrite ici se répète dans toutes les US suivantes : rien n'y entre sans source et sans validation humaine.
 

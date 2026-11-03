@@ -6,8 +6,8 @@ les métadonnées de chaque champ. Elle reste ensuite dans la conversation et
 est relue à chaque action de l'agent. Ce script la réduit à un texte court.
 
 Usage :
-  python3 .github/outils/lire_us.py <id> --contexte docs/projets/<projet>/CONTEXTE.md [--commentaires]
-  python3 .github/outils/lire_us.py <id> --url <url organisation> --projet <projet ADO>
+  python3 .github/qc/outils/lire_us.py <id> --contexte docs/projets/<projet>/CONTEXTE.md [--commentaires]
+  python3 .github/qc/outils/lire_us.py <id> --url <url organisation> --projet <projet ADO>
          [--commentaires] [--export <dossier sources>]
 
 Avec --contexte, l'URL et le projet viennent de la section 0 du contexte et

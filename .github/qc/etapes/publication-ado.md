@@ -1,14 +1,12 @@
----
-name: publication-ado
-description: 'Publie dans Azure Test Plans les scénarios relus d''une US (fichier qc-reports/US-<id>.md), exactement tels qu''ils sont, après aperçu et validation explicite, ou produit un CSV à importer soi-même (mode csv). Lie chaque cas à l''US, vérifie les liens, ne crée jamais de doublon ni de plan de test. À utiliser pour « publie les cas », « crée-les dans ADO », « fais-moi le CSV ».'
-argument-hint: '<id US> [csv] [plan <id>] [suite <id>] [assigne <email>]'
----
-
 # Publication des scénarios dans Azure DevOps
 
-Arguments : ceux donnés dans la demande (numéros d'US, options).
-
 `<url>` et `<projet ADO>` viennent de la section 0 du contexte du projet (`docs/projets/<projet>/CONTEXTE.md`).
+
+Règles d'écriture dans Azure DevOps :
+
+1. Lire le code HTTP avant le corps (`curl -sS -w '\n%{http_code}' -u ":$ADO_PAT" …`). Tout code hors 2xx, y compris 203, est un échec : 401 ou 203 « PAT invalide ou sans le droit requis », 403 « pas d'accès », 404 « work item introuvable ».
+2. Jamais de texte français dans `-d '...'` : écrire le corps dans `.qc-agent/` et l'envoyer avec `--data-binary @fichier`.
+3. Ne jamais relancer à l'aveugle, ne jamais fabriquer un identifiant, jamais de `DELETE`.
 
 Ce skill publie le fichier relu par un humain, tel quel. Il ne réécrit, ne complète et n'ajoute aucun scénario : si quelque chose doit changer, l'humain modifie le fichier ou relance `/gherkin-test-generation`.
 
@@ -24,11 +22,11 @@ Si une écriture répond 401 ou 403 en mode API, proposer le mode CSV au lieu de
 ## 1. Construire les cas sans IA
 
 1. Si `qc-reports/US-<id>.md` n'existe pas ou ne contient aucun bloc ```gherkin : STOP, « Rapport introuvable : lancer d'abord /us-analysis puis /gherkin-test-generation, et relire le rapport ».
-2. Lire l'US avec `python3 .github/outils/lire_us.py <usId> …` pour `System.TeamProject`, `System.AreaPath`, `System.IterationPath` et `System.Rev`. Garder l'id comme `<usId>`. Si la révision est plus récente que celle notée dans le rapport, STOP : « L'US a changé depuis l'analyse (révision <a> lue, <b> actuelle) : relancer /us-analysis ou confirmer explicitement que la modification ne change pas les scénarios ».
+2. Lire l'US avec `python3 .github/qc/outils/lire_us.py <usId> …` pour `System.TeamProject`, `System.AreaPath`, `System.IterationPath` et `System.Rev`. Garder l'id comme `<usId>`. Si la révision est plus récente que celle notée dans le rapport, STOP : « L'US a changé depuis l'analyse (révision <a> lue, <b> actuelle) : relancer /us-analysis ou confirmer explicitement que la modification ne change pas les scénarios ».
 3. Personne à qui assigner les cas : l'adresse donnée dans la demande, sinon personne (le dire).
 4. Construire les corps de requête :
    ```bash
-   python3 .github/skills/gherkin-test-generation/scripts/build_tc.py build qc-reports/US-<id>.md --us <usId> \
+   python3 .github/qc/outils/build_tc.py build qc-reports/US-<id>.md --us <usId> \
      --out .qc-agent/US-<id> --assignee "<email>" --area "<AreaPath>" --iteration "<IterationPath>"
    ```
 5. Si le script signale une erreur : STOP, afficher les erreurs, ne rien publier. Ne jamais construire le XML des étapes à la main.
@@ -89,7 +87,7 @@ Afficher, sans rien écrire : le plan et la suite (existante ou à créer), la l
 1. Mêmes étapes 1 et 2 de la section 1. Sans accès en lecture, demander l'Area Path à l'utilisateur.
 2. Construire le fichier :
    ```bash
-   python3 .github/skills/gherkin-test-generation/scripts/build_tc.py csv qc-reports/US-<id>.md --us <usId> \
+   python3 .github/qc/outils/build_tc.py csv qc-reports/US-<id>.md --us <usId> \
      --out qc-reports/US-<id>-import.csv --area "<AreaPath>" --assignee "<email>"
    ```
    Erreur du script : STOP, afficher les erreurs.

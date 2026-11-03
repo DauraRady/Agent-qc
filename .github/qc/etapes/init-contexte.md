@@ -1,12 +1,4 @@
----
-name: init-contexte
-description: 'Construit le fichier de contexte d''un projet (docs/projets/<projet>/CONTEXTE.md) à partir de ses sources (PRD, DAG, décisions, maquettes décrites), une ligne sourcée par règle, sans rien inventer. À utiliser une seule fois par projet, avant la première analyse d''US.'
-argument-hint: '<projet>'
----
-
 # Création du contexte projet
-
-Arguments : ceux donnés dans la demande (numéros d'US, options).
 
 Ce skill crée le contexte. Il ne le met jamais à jour : pour cela, `/maj-contexte`.
 

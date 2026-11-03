@@ -1,14 +1,6 @@
----
-name: us-analysis
-description: 'Analyse une User Story et ses critères d''acceptation avec le contexte projet, sans inventer de règle. Produit les règles avec leur source, les préconditions (rôle, données, écran), les combinaisons à tester, les questions au PO, un verdict qui dit quoi rédiger et les propositions d''ajout au contexte. À utiliser avant toute rédaction de cas de test, ou pour « analyse cette US ».'
-argument-hint: '<id US> [projet=<nom>] [commentaires]'
----
-
 # Analyse d'une User Story
 
-Arguments : ceux donnés dans la demande (numéros d'US, options).
-
-La sortie de ce skill est l'entrée du skill `gherkin-test-generation`. Elle s'écrit dans `qc-reports/US-<id>.md` et doit être courte : une personne doit pouvoir la relire en cinq minutes.
+La sortie de cette étape est l'entrée de l'étape `gherkin-test-generation`. Elle s'écrit dans `qc-reports/US-<id>.md` et doit être courte : une personne doit pouvoir la relire en cinq minutes.
 
 ## Principe non négociable
 
@@ -26,8 +18,8 @@ Une bonne pratique, une habitude du domaine ou une convention d'interface ne ren
 
 ## Étape 0 : lire les sources
 
-1. Lire l'US avec `python3 .github/outils/lire_us.py <id> --contexte docs/projets/<projet>/CONTEXTE.md` : description, critères d'acceptation, et les commentaires quand ils sont demandés. Noter sa révision (`System.Rev`) et sa date de modification : la publication les comparera. Si Azure DevOps n'est pas joignable, lire l'export `docs/projets/<projet>/sources/US-<id>.md` s'il existe, et le dire. Un passage marqué « non lu » dans l'export n'est jamais complété : il devient une question.
-2. Lire les sections du contexte utiles à l'analyse : `python3 .github/outils/contexte.py docs/projets/<projet>/CONTEXTE.md analyse` (toutes sauf le journal ; section 9 réduite aux questions ouvertes). Ne pas relire le contexte ensuite : tout ce qui sert à l'analyse, y compris la liste des US pour l'étape 1 bis, est dans cette sortie. S'il n'existe pas, le dire en une ligne, proposer `/init-contexte` et continuer sans rien inventer pour compenser.
+1. Lire l'US avec `python3 .github/qc/outils/lire_us.py <id> --contexte docs/projets/<projet>/CONTEXTE.md` : description, critères d'acceptation, et les commentaires quand ils sont demandés. Noter sa révision (`System.Rev`) et sa date de modification : la publication les comparera. Si Azure DevOps n'est pas joignable, lire l'export `docs/projets/<projet>/sources/US-<id>.md` s'il existe, et le dire. Un passage marqué « non lu » dans l'export n'est jamais complété : il devient une question.
+2. Lire les sections du contexte utiles à l'analyse : `python3 .github/qc/outils/contexte.py docs/projets/<projet>/CONTEXTE.md analyse` (toutes sauf le journal ; section 9 réduite aux questions ouvertes). Ne pas relire le contexte ensuite : tout ce qui sert à l'analyse, y compris la liste des US pour l'étape 1 bis, est dans cette sortie. S'il n'existe pas, le dire en une ligne, proposer `/init-contexte` et continuer sans rien inventer pour compenser.
 3. Dans `docs/projets/<projet>/sources/`, lire seulement les passages que l'US ou le contexte citent.
 4. Une information donnée dans la demande (réponse du PO, texte d'une maquette) compte comme source seulement avec son auteur et sa date. Une décision du PO est de rang 2, un autre complément de rang 4.
 5. Si les critères ne sont pas numérotés, les numéroter `AC-1`, `AC-2` dans l'ordre du texte.
@@ -78,6 +70,8 @@ Un détail manquant ne rend pas toute la règle À arbitrer. Si l'US dit ce qui 
 Une règle n'est À arbitrer que si le comportement lui-même manque ou se contredit. Une règle laissée À arbitrer alors que l'US décrit le comportement est une couverture perdue, aussi grave qu'un résultat inventé.
 
 ## Étape 1 bis : croiser avec les autres US
+
+Si un rapport de cohérence du sprint existe, ses écarts sur cette US sont déjà dans la sortie de `python3 .github/qc/outils/ecarts.py <id>`, lancée avec la lecture du contexte : les reprendre avec leur numéro (E1, E2…) au lieu de les rechercher, et ne pas ouvrir le rapport complet.
 
 Pour chaque champ, écran, message ou règle de l'US :
 

@@ -1,18 +1,10 @@
----
-name: gherkin-test-generation
-description: 'Rédige en français les scénarios Gherkin d''une User Story analysée (nominaux, négatifs, limites), avec toutes les préconditions (rôle connecté, écran, données), les actions et les résultats exacts, sans rien inventer. Prépare aussi la version cas manuel pour Azure Test Plans. À utiliser pour « écris les cas de test », « génère le Gherkin ».'
-argument-hint: '<id US> [manuel]'
----
-
 # Rédaction des scénarios Gherkin
 
-Arguments : ceux donnés dans la demande (numéros d'US, options).
-
-Lire `references/guide-ecriture-gherkin.md` à la première utilisation de la session : il contient les exemples bons et mauvais.
+Lire `.github/qc/etapes/references/guide-ecriture-gherkin.md` à la première utilisation de la session : il contient les exemples bons et mauvais.
 
 ## Point de départ
 
-1. Partir de l'analyse écrite dans `qc-reports/US-<id>.md` : règles, préconditions, combinaisons, verdict. Ne pas refaire l'analyse et ne pas relire l'US : l'analyse contient ses citations. Rouvrir l'US avec `lire_us.py` seulement pour vérifier une citation douteuse. Du contexte, charger seulement `python3 .github/outils/contexte.py docs/projets/<projet>/CONTEXTE.md gherkin` (rôles, comptes, écrans, données, synonymes). Les scénarios s'ajoutent à la suite, dans le même fichier.
+1. Partir de l'analyse écrite dans `qc-reports/US-<id>.md` : règles, préconditions, combinaisons, verdict. Ne pas refaire l'analyse et ne pas relire l'US : l'analyse contient ses citations. Rouvrir l'US avec `lire_us.py` seulement pour vérifier une citation douteuse. Du contexte, charger seulement `python3 .github/qc/outils/contexte.py docs/projets/<projet>/CONTEXTE.md gherkin` (rôles, comptes, écrans, données, synonymes). Les scénarios s'ajoutent à la suite, dans le même fichier.
 2. S'il n'y a pas d'analyse, appliquer d'abord `us-analysis`.
 3. Verdict « Non prête » : ne rédiger aucun scénario, renvoyer aux questions.
 4. Ne rédiger des scénarios que pour les règles Rédigeables. Une règle À arbitrer ou Exploratoire n'a jamais de scénario.
@@ -123,7 +115,7 @@ Objectif du cas : uniquement s'il apporte une information que le titre ne donne 
 Le tableau `ID | Test case | Gherkin BDD scenario | Type of test` n'est jamais écrit à la main : il est produit par le script, à partir des blocs Gherkin relus.
 
 ```bash
-python3 .github/skills/gherkin-test-generation/scripts/build_tc.py table qc-reports/US-<id>.md --out qc-reports/US-<id>-ado.md
+python3 .github/qc/outils/build_tc.py table qc-reports/US-<id>.md --out qc-reports/US-<id>-ado.md
 ```
 
 Ce que fait le script :
@@ -159,7 +151,7 @@ Puis produire le tableau Azure DevOps avec le script (section Tableau pour Azure
 Lancer le script de ce skill sur le rapport avant de livrer (`python` si `python3` n'existe pas) :
 
 ```bash
-python3 .github/skills/gherkin-test-generation/scripts/build_tc.py check qc-reports/US-<id>.md
+python3 .github/qc/outils/build_tc.py check qc-reports/US-<id>.md
 ```
 
 Il refuse les mots-clés anglais, un deuxième `Quand`, un `Quand` après `Alors`, un scénario sans précondition, sans action ou sans résultat, un résultat vague ou avec « ou », un paramètre absent des `Exemples`, les titres en double. Il signale un type de test inconnu. Corriger chaque erreur et relancer jusqu'à zéro. Si la commande demande une autorisation, la demander à l'utilisateur : ne jamais livrer sans ce contrôle.

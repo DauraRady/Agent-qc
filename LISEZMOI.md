@@ -2,7 +2,7 @@
 
 ## Installer (une fois, sur une branche du dépôt de l'équipe)
 
-1. Copier à la racine du dépôt : `.github/agents/qc.agent.md` (il remplace l'actuel), `.github/skills/`, `docs/`, `qc-reports/`.
+1. Copier à la racine du dépôt : `.github/agents/qc.agent.md` (il remplace l'actuel), `.github/qc/`, `.github/copilot-instructions.md`, `docs/`, `qc-reports/`.
 2. Ajouter `.qc-agent/` au `.gitignore`.
 3. Vérifier que le secret `ADO_PAT` existe dans Settings, Environments, `copilot` (l'agent actuel l'utilise déjà). En lecture seule pour analyser ; lecture et écriture seulement pour publier.
 4. Ouvrir une pull request, la faire relire, fusionner.
@@ -30,7 +30,7 @@ L'agent fait une étape, écrit son fichier dans `qc-reports/`, s'arrête et pro
 
 ## Utiliser dans VS Code sans gaspiller de crédits
 
-VS Code lit le même agent et les mêmes skills (`.github/agents`, `.github/skills`). À chaque message, Copilot renvoie au modèle tout l'historique du chat, les fichiers joints et la description des outils actifs, et il le refait à chaque action de l'agent. Le coût dépend donc surtout de ces règles d'usage :
+VS Code lit le même agent (`.github/agents`). À chaque message, Copilot renvoie au modèle tout l'historique du chat, les fichiers joints et la description des outils actifs, et il le refait à chaque action de l'agent. Le coût dépend donc surtout de ces règles d'usage :
 
 | Règle | Pourquoi |
 |---|---|
@@ -42,3 +42,18 @@ VS Code lit le même agent et les mêmes skills (`.github/agents`, `.github/skil
 | Fermer les gros fichiers avant d'écrire, retirer les pièces jointes proposées | Le fichier ouvert est souvent joint automatiquement au message |
 
 Pour mesurer : noter les crédits Copilot avant et après une étape, dans les paramètres du compte GitHub.
+
+## Pourquoi les méthodes ne sont pas des skills
+
+Les méthodes de chaque étape sont dans `.github/qc/etapes/`, pas dans `.github/skills/`. Copilot annonce à chaque message la liste et la description de tous les skills du dépôt, et peut en charger plusieurs s'il les juge utiles. Ici, l'agent lit la méthode de l'étape demandée, et elle seule.
+
+| Fichier | Rôle |
+|---|---|
+| `.github/agents/qc.agent.md` | Le routeur : quelle méthode lire, quel profil de contexte, quelles lectures, pour chaque étape |
+| `.github/qc/etapes/*.md` | Une méthode par étape |
+| `.github/qc/outils/contexte.py` | Les sections du contexte utiles à l'étape (profils `coherence`, `analyse`, `gherkin`, `publication`, `anomalie`) |
+| `.github/qc/outils/lire_us.py` | L'US réduite à l'utile, depuis Azure DevOps ou l'export |
+| `.github/qc/outils/ecarts.py` | Les écarts d'un rapport de cohérence de sprint qui concernent une US |
+| `.github/qc/outils/build_tc.py` | Contrôle des scénarios, tableau Azure DevOps, CSV |
+
+Ce qui passe d'une étape à l'autre passe par les fichiers (`qc-reports/`, `CONTEXTE.md`), pas par l'historique du chat : chaque étape peut donc partir d'un chat neuf.

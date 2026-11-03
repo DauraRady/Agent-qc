@@ -1,14 +1,12 @@
----
-name: redaction-anomalie
-description: 'Rédige une anomalie (bug fonctionnel ou d''interface) reproductible et sourcée à partir de ce que le testeur a constaté, vérifie les doublons, puis la crée dans Azure DevOps après aperçu et validation explicite. À utiliser pour « rédige un bug », « j''ai trouvé une anomalie », « crée le bug dans ADO ».'
-argument-hint: '<ce que j''ai constaté>'
----
-
 # Rédaction d'une anomalie
 
-Arguments : ceux donnés dans la demande (numéros d'US, options).
-
 `<url>` et `<projet ADO>` viennent de la section 0 du contexte du projet.
+
+Règles d'écriture dans Azure DevOps :
+
+1. Lire le code HTTP avant le corps (`curl -sS -w '\n%{http_code}' -u ":$ADO_PAT" …`). Tout code hors 2xx, y compris 203, est un échec : 401 ou 203 « PAT invalide ou sans le droit requis », 403 « pas d'accès », 404 « work item introuvable ».
+2. Jamais de texte français dans `-d '...'` : écrire le corps dans `.qc-agent/` et l'envoyer avec `--data-binary @fichier`.
+3. Ne jamais relancer à l'aveugle, ne jamais fabriquer un identifiant, jamais de `DELETE`.
 
 Un bon bug se reproduit sans poser de question, compare un résultat obtenu à un résultat attendu sourcé, et ne contient qu'un seul écart.
 

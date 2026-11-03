@@ -6,10 +6,10 @@ fait payer, à chaque action de l'agent, des sections dont l'étape n'a pas beso
 (journal, liste des sources, points déjà répondus).
 
 Usage :
-  python3 .github/outils/contexte.py <CONTEXTE.md | auto> <étape>
-  python3 .github/outils/contexte.py <CONTEXTE.md> --sections 2,9
-  python3 .github/outils/contexte.py <CONTEXTE.md> <étape> --sections 10   (ajoute des sections)
-  python3 .github/outils/contexte.py <CONTEXTE.md> tout
+  python3 .github/qc/outils/contexte.py <CONTEXTE.md | auto> <étape>
+  python3 .github/qc/outils/contexte.py <CONTEXTE.md> --sections 2,9
+  python3 .github/qc/outils/contexte.py <CONTEXTE.md> <étape> --sections 10   (ajoute des sections)
+  python3 .github/qc/outils/contexte.py <CONTEXTE.md> tout
 
 Étapes : coherence, analyse, gherkin, publication, anomalie, tout.
 En section 9, les points à l'état « répondu » ou « remplacé » sont retirés,

@@ -1,19 +1,11 @@
----
-name: coherence-sprint
-description: 'Compare plusieurs US d''un sprint entre elles et avec le contexte projet (US des sprints précédents) : même champ, même règle, même message décrits différemment, champs renommés, périmètre qui change, cas de test existants à revoir, données difficiles à obtenir. Produit une carte du sprint et les questions au PO, sans rédiger de scénario. À utiliser au début d''un sprint, avant /us-analysis.'
-argument-hint: '<id US> <id US> … [sprint=<n>]'
----
-
 # Cohérence d'un sprint
-
-Arguments : ceux donnés dans la demande (numéros d'US, options).
 
 Une US se lit rarement seule : une US du sprint 4 peut modifier, sans le dire, ce qu'une US du sprint 1 décrivait. Ce skill cherche ces écarts avant que chaque US soit analysée. Il n'écrit aucun scénario et ne modifie pas le contexte.
 
 ## 1. Lire
 
-1. Le contexte du projet, sections utiles seulement : `python3 .github/outils/contexte.py docs/projets/<projet>/CONTEXTE.md coherence`. En particulier la section 2 (US connues et leurs cas de test), la section 5 (termes et synonymes), la section 6 (règles) et la section 9 (points ouverts).
-2. Chaque US citée, avec `python3 .github/outils/lire_us.py <id> …` (toutes les US dans la même commande, enchaînées avec `&&`) : Azure DevOps, ou `docs/projets/<projet>/sources/US-<id>.md` si Azure DevOps n'est pas joignable (le dire). Noter pour chacune la révision lue (`System.Rev`) et sa date.
+1. Le contexte du projet, sections utiles seulement : `python3 .github/qc/outils/contexte.py docs/projets/<projet>/CONTEXTE.md coherence`. En particulier la section 2 (US connues et leurs cas de test), la section 5 (termes et synonymes), la section 6 (règles) et la section 9 (points ouverts).
+2. Chaque US citée, avec `python3 .github/qc/outils/lire_us.py <id> …` (toutes les US dans la même commande, enchaînées avec `&&`) : Azure DevOps, ou `docs/projets/<projet>/sources/US-<id>.md` si Azure DevOps n'est pas joignable (le dire). Noter pour chacune la révision lue (`System.Rev`) et sa date.
 3. Les US plus anciennes citées par le contexte qui touchent les mêmes champs ou écrans : seulement les passages concernés.
 4. Les fichiers de cas de test cités en section 2 du contexte, s'ils existent dans le dépôt : chercher les cas qui utilisent les champs touchés. S'ils n'existent pas, le dire.
 
