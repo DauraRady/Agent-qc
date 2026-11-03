@@ -98,6 +98,19 @@ def depuis_export(dossier, us_id, raison):
     return 3
 
 
+def trouver_contexte(chemin):
+    """« auto » : le seul docs/projets/<projet>/CONTEXTE.md autre que _modele."""
+    if chemin != "auto":
+        return chemin, None
+    import glob
+    trouves = [c for c in sorted(glob.glob("docs/projets/*/CONTEXTE.md")) if "/_modele/" not in c]
+    if len(trouves) == 1:
+        return trouves[0], None
+    if not trouves:
+        return None, "ÉCHEC : aucun contexte projet dans docs/projets/. Proposer init-contexte."
+    return None, "ÉCHEC : plusieurs projets (%s). Préciser projet=<nom>." % ", ".join(c.split("/")[2] for c in trouves)
+
+
 def config_contexte(chemin):
     """Lit l'URL et le projet Azure DevOps dans la section 0 du contexte."""
     valeurs = {}
@@ -119,6 +132,10 @@ def main():
     p.add_argument("--export", help="dossier docs/projets/<projet>/sources")
     a = p.parse_args()
     if a.contexte:
+        a.contexte, erreur = trouver_contexte(a.contexte)
+        if erreur:
+            print(erreur)
+            return 3
         if not os.path.isfile(a.contexte):
             print("ÉCHEC : %s n'existe pas. Proposer init-contexte." % a.contexte)
             return 3
